@@ -21,7 +21,7 @@ export const getOrCreateDM = mutation({
         !c.isGroup &&
         c.participants.length === 2 &&
         c.participants.includes(me._id) &&
-        c.participants.includes(otherUserId)
+        c.participants.includes(otherUserId),
     );
 
     if (existing) return existing._id;
@@ -63,8 +63,8 @@ export const createGroup = mutation({
 
 // List conversations for current user
 export const listConversations = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { search: v.optional(v.string()) },
+  handler: async (ctx, { search }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
@@ -85,14 +85,14 @@ export const listConversations = query({
     const enriched = await Promise.all(
       myConvos.map(async (convo) => {
         const participants = await Promise.all(
-          convo.participants.map((id) => ctx.db.get(id))
+          convo.participants.map((id) => ctx.db.get(id)),
         );
 
         // Get unread count
         const readReceipt = await ctx.db
           .query("readReceipts")
           .withIndex("by_conversation_user", (q) =>
-            q.eq("conversationId", convo._id).eq("userId", me._id)
+            q.eq("conversationId", convo._id).eq("userId", me._id),
           )
           .unique();
 
@@ -102,7 +102,7 @@ export const listConversations = query({
         const messages = await ctx.db
           .query("messages")
           .withIndex("by_conversation", (q) =>
-            q.eq("conversationId", convo._id)
+            q.eq("conversationId", convo._id),
           )
           .collect();
 
@@ -110,7 +110,7 @@ export const listConversations = query({
           (m) =>
             m._creationTime > lastReadTime &&
             m.senderId !== me._id &&
-            !m.isDeleted
+            !m.isDeleted,
         ).length;
 
         return {
@@ -119,8 +119,19 @@ export const listConversations = query({
           unreadCount,
           me,
         };
-      })
+      }),
     );
+
+    if (search && search.trim()) {
+      const lower = search.toLowerCase();
+      return enriched.filter((convo) => {
+        if (convo.isGroup) {
+          return convo.groupName?.toLowerCase().includes(lower);
+        }
+        const other = convo.participants.find((p: any) => p?._id !== me._id);
+        return other?.name?.toLowerCase().includes(lower);
+      });
+    }
 
     return enriched;
   },
@@ -137,7 +148,7 @@ export const getConversation = query({
     if (!convo) return null;
 
     const participants = await Promise.all(
-      convo.participants.map((id) => ctx.db.get(id))
+      convo.participants.map((id) => ctx.db.get(id)),
     );
 
     const me = await ctx.db

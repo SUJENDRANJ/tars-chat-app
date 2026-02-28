@@ -19,10 +19,6 @@ export default function UserSearch({ onClose, onSelectUser }: Props) {
 
   const users = useQuery(api.users.listUsers, { search: search || undefined });
 
-  // Debug logging
-  console.log("UserSearch - users data:", users);
-  console.log("UserSearch - search term:", search);
-
   const handleSelectUser = async (userId: Id<"users">) => {
     try {
       const convId = await getOrCreateDM({ otherUserId: userId });

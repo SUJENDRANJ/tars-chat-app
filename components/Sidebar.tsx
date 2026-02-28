@@ -14,10 +14,13 @@ export default function Sidebar() {
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const [searchTerm, setSearchTerm] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showGroup, setShowGroup] = useState(false);
 
-  const conversations = useQuery(api.conversations.listConversations);
+  const conversations = useQuery(api.conversations.listConversations, {
+    search: searchTerm || undefined,
+  });
   const currentUser = useQuery(api.users.getCurrentUser);
 
   const activeConvId = pathname.startsWith("/chat/")
@@ -72,21 +75,17 @@ export default function Sidebar() {
                 title="New group"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
+                  className="w-5 h-5 text-gray-600"
                   fill="none"
-                  stroke="gray"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <circle cx="9" cy="7" r="3"></circle>
-                  <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path>
-
-                  <circle cx="17" cy="9" r="2.5"></circle>
-                  <path d="M14 20c0-2.2 1.8-4 4-4 1.2 0 2.3.5 3 1.3"></path>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               </button>
               <button
@@ -119,6 +118,8 @@ export default function Sidebar() {
             <input
               type="text"
               placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             />
             <svg
