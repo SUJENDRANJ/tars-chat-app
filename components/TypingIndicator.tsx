@@ -40,7 +40,3 @@ export default function TypingIndicator({ users }: Props) {
     </div>
   );
 }
-
-/* {typingUsers && typingUsers.length > 0 && (
-              <TypingIndicator users={typingUsers as any[]} />
-            )} */

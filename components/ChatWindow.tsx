@@ -7,9 +7,9 @@ import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import MessageItem from "./MessageItem";
-// import TypingIndicator from "./TypingIndicator";
+import TypingIndicator from "./TypingIndicator";
 
-const ALLOWED_REACTIONS = [""];
+const ALLOWED_REACTIONS = ["👍", "❤️", "😂", "😮", "😢"];
 
 interface Props {
   conversationId: Id<"conversations">;
@@ -293,10 +293,9 @@ export default function ChatWindow({ conversationId }: Props) {
               );
             })}
 
-            {/* typing indication */}
-            {typingUsers?.map((user: any) => (
-              <div key={user.clerkId}>{user.name} is typing...</div>
-            ))}
+            {typingUsers && typingUsers.length > 0 && (
+              <TypingIndicator users={typingUsers as any[]} />
+            )}
           </>
         )}
         <div ref={messagesEndRef} />
