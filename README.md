@@ -1,4 +1,4 @@
-i am creating a chat app, with shadcn, typescript, next.js, clerk, and Convex
+creating a chat app, with shadcn, typescript, next.js, clerk, and Convex
 
 features:
 
